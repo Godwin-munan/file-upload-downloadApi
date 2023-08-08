@@ -2,6 +2,8 @@ package com.munan.fileuploaddownloadApi.controller;
 
 import com.munan.fileuploaddownloadApi.service.FilesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,13 @@ public class FilesController {
     }
     
     
-    @GetMapping("/{fileName}")
-    public ResponseEntity<?> downloadFile(@PathVariable Flux<String> fileNameMono){
-        Flux<byte[]> imageData = service.downloadImageFromFileSystem(fileNameMono);
+    @GetMapping(value = "/{fileName}")
+    public ResponseEntity<Flux<Resource>> downloadFile(@PathVariable String fileName){
         
-        return null;
+        return ResponseEntity.ok()       
+              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+              .contentType(MediaType.APPLICATION_OCTET_STREAM)
+              .body(service.downloadImageFromFileSystem(fileName));
         
     }
     

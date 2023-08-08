@@ -4,19 +4,15 @@ package com.munan.fileuploaddownloadApi.service;
 import static com.munan.fileuploaddownloadApi.constants.FileConstant.FILE_PATH;
 import com.munan.fileuploaddownloadApi.model.FileData;
 import com.munan.fileuploaddownloadApi.repository.FilesRepository;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,20 +24,23 @@ public class FilesService {
     @Value("${baseUrl}")
     private String baseUrl;
     
+    @Value("${fileDir}")
+    private String fileDir;
+    
     private final FilesRepository repository;
     
-    private String PATTERN = "[A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-            +"[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private String fileDirectoryPath;
+    FileSystemResource file;
     
-    byte[] file;
     
     public Mono<String> uploadImageToFileSystem(Mono<FilePart> fileMono) throws IOException, Exception {
-        
+                
           return fileMono.flatMap(file -> {
-              String filePath = Paths.get(FILE_PATH+"\\"+file.filename())
+              String filePath = Paths.get(fileDir+file.filename())
                       .normalize()
                       .toAbsolutePath()
                       .toString();
+              String returnLink = baseUrl+"/api/files/"+file.filename();
               
                     /*            
                       var randomName = UUID.randomUUID()
@@ -53,25 +52,20 @@ public class FilesService {
               return repository.insert(FileData.builder()
                     .name(file.filename())
                     .type(file.headers().getContentType().toString())
-                    .filePath(filePath)
+                    .filePath(returnLink)
                     .build())
                       .doOnNext(savedFile -> file.transferTo(Path.of(filePath)).subscribe())
-                      .flatMap(savedFile -> Mono.just("file uploaded successfully: "+baseUrl+"/api/files/" + savedFile.getName()));
+                      .flatMap(savedFile -> Mono.just("file uploaded successfully: "+returnLink));
           });
 
     }
 
-    public Flux<byte[]> downloadImageFromFileSystem(Flux<String> fileNameMono){
-        
-        return fileNameMono.flatMap(fileName -> repository.findByName(fileName))
-                .flatMap(fileData -> {
-                    try {
-                            file = Files.readAllBytes(new File(fileData.getFilePath()).toPath());
-                        } catch (IOException ex) {
-                            Logger.getLogger(FilesService.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    return Flux.just(file);});
-        
+    public Flux<Resource> downloadImageFromFileSystem(String fileName){
+
+            return repository.findByName(fileName)
+                    .log()
+                    .flatMap(savedFile -> Flux.just(new FileSystemResource(fileDir+savedFile.getName())));
+
     }
     
     
