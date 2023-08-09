@@ -1,12 +1,13 @@
 
 package com.munan.fileuploaddownloadApi.service;
 
-import static com.munan.fileuploaddownloadApi.constants.FileConstant.FILE_PATH;
+
 import com.munan.fileuploaddownloadApi.model.FileData;
 import com.munan.fileuploaddownloadApi.repository.FilesRepository;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -29,32 +30,37 @@ public class FilesService {
     
     private final FilesRepository repository;
     
-    private String fileDirectoryPath;
-    FileSystemResource file;
     
-    
-    public Mono<String> uploadImageToFileSystem(Mono<FilePart> fileMono) throws IOException, Exception {
+    public Mono<String> uploadImageToFileSystem(Mono<FilePart> fileMono) 
+            throws IOException {
                 
           return fileMono.flatMap(file -> {
-              String filePath = Paths.get(fileDir+file.filename())
+              String randomName = UUID.randomUUID()
+                      .toString()
+                      .substring(0, 13);
+              
+              
+              String originalFileName = file.filename();
+              
+              int lastDotIndex = originalFileName.lastIndexOf(".");
+              String extension = (lastDotIndex != -1) ? originalFileName
+                .substring(lastDotIndex) : "";
+              
+              String newFileName = randomName+extension;
+              
+              String filePath = Paths.get(fileDir+newFileName)
                       .normalize()
                       .toAbsolutePath()
                       .toString();
-              String returnLink = baseUrl+"/api/files/"+file.filename();
+              String returnLink = baseUrl+"/api/files/"+newFileName;
               
-                    /*            
-                      var randomName = UUID.randomUUID()
-                              .toString()
-                              .substring(0, 13);
-                      file.filename().replaceFirst(PATTERN, randomName);
-                    */
-                    
               return repository.insert(FileData.builder()
                     .name(file.filename())
                     .type(file.headers().getContentType().toString())
                     .filePath(returnLink)
                     .build())
-                      .doOnNext(savedFile -> file.transferTo(Path.of(filePath)).subscribe())
+                      .doOnNext(savedFile -> file.transferTo(Path.of(filePath))
+                              .subscribe())
                       .flatMap(savedFile -> Mono.just("file uploaded successfully: "+returnLink));
           });
 
@@ -63,8 +69,8 @@ public class FilesService {
     public Flux<Resource> downloadImageFromFileSystem(String fileName){
 
             return repository.findByName(fileName)
-                    .log()
-                    .flatMap(savedFile -> Flux.just(new FileSystemResource(fileDir+savedFile.getName())));
+                    .flatMap(savedFile -> Flux
+                            .just(new FileSystemResource(fileDir+savedFile.getName())));
 
     }
     
