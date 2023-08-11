@@ -37,3 +37,28 @@ Upload a File
 Download a File
 .Endpoint: GET `/api/files/fileName`
 .Path Variable @PathVariable String
+
+Technology Stack
+- Spring Boot
+- Spring WebFlux
+- MongoDB
+- Reactive Programming
+
+Project Structure
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── com/
+│   │   │   │   ├── munan/
+│   │   │   │   │   ├── controller/
+│   │   │   │   │   │   ├── FilesController.java
+│   │   │   │   │   ├── model/
+│   │   │   │   │   │   ├── FileData.java
+│   │   │   │   │   ├── repository/
+│   │   │   │   │   │   ├── FilesRepository.java
+│   │   │   │   │   ├── service/
+│   │   │   │   │   │   ├── FilesService.java
+│   │   │   ├── resources/
+│   │   │   │   ├── application.yaml
+├── pom.xml
+├── README.md
