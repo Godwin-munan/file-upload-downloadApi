@@ -46,7 +46,7 @@ public class FilesService {
               String extension = (lastDotIndex != -1) ? originalFileName
                 .substring(lastDotIndex) : "";
               
-              String newFileName = randomName+extension;
+              String newFileName = randomName+extension.toLowerCase();
               
               String filePath = Paths.get(fileDir+newFileName)
                       .normalize()
@@ -55,7 +55,7 @@ public class FilesService {
               String returnLink = baseUrl+"/api/files/"+newFileName;
               
               return repository.insert(FileData.builder()
-                    .name(file.filename())
+                    .name(newFileName)
                     .type(file.headers().getContentType().toString())
                     .filePath(returnLink)
                     .build())
