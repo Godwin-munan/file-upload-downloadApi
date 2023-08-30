@@ -1,0 +1,32 @@
+
+name: file-upload-download
+services:
+  mongodb:
+    image: mongo:4.4.6
+    container_name: file_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME: "admin"
+      - MONGO_INITDB_ROOT_PASSWORD: "admin"
+#    env_file:
+#      - .env
+
+
+  app:
+    image: gtee28/file_upload_download_app:1.0.0
+    container_name: file_upload_download_app
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mongodb
+    environment:
+      BASE_URL: $${BASE_URL:http://localhost:9090}
+      FILE_DIRECTORY_PATH: /app/files
+    volumes:
+        - C:\Users\godwi\OneDrive\Desktop\FilePath:/app/files
+
+volumes:
+  mongodb_data:
