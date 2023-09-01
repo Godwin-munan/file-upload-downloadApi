@@ -1,0 +1,10 @@
+#
+#spring:
+#  profiles: local
+#  data:
+#    mongodb:
+#      host: localhost
+#
+#
+#baseUrl: ${BASE_URL:http://localhost:9090}
+#fileDir: ${FILE_DIRECTORY_PATH}

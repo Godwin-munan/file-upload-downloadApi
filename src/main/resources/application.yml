@@ -1,13 +1,16 @@
 
 spring:
+#  profiles:
+#    active: local
   data:
     mongodb:
       database: filesdb
-      host: localhost
+      host: mongodb
       port: 27017
+
+
+baseUrl: ${BASE_URL:http://localhost:9090}
+fileDir: ${FILE_DIRECTORY_PATH}
 
 server:
   port: 9090
-  
-baseUrl: ${BASE_URL:http://localhost:9090}
-fileDir: ${FILE_DIRECTORY_PATH}

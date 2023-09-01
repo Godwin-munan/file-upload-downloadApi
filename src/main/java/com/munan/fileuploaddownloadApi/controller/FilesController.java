@@ -28,7 +28,7 @@ public class FilesController {
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImageOfFileSystem(@RequestPart("image")Mono<FilePart> fileMono) throws Exception{
-
+        System.out.println("Show Request:::::");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.uploadImageToFileSystem(fileMono));
     }

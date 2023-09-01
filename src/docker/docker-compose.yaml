@@ -5,12 +5,12 @@ services:
     image: mongo:4.4.6
     container_name: file_mongodb
     ports:
-      - "27017:27017"
+      - 27017:27017
     volumes:
       - mongodb_data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME: "admin"
-      - MONGO_INITDB_ROOT_PASSWORD: "admin"
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME: "admin"
+#      - MONGO_INITDB_ROOT_PASSWORD: "admin"
 #    env_file:
 #      - .env
 
@@ -23,10 +23,9 @@ services:
     depends_on:
       - mongodb
     environment:
-      BASE_URL: $${BASE_URL:http://localhost:9090}
       FILE_DIRECTORY_PATH: /app/files
     volumes:
-        - C:\Users\godwi\OneDrive\Desktop\FilePath:/app/files
+        - /c/Users/godwi/OneDrive/Desktop/FilePath:/app/files
 
 volumes:
   mongodb_data:

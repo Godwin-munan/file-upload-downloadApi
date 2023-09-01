@@ -1,0 +1,8 @@
+#
+#spring:
+#  profiles: docker
+#  data:
+#    mongodb:
+#      host: mongodb
+#
+#baseUrl: ${BASE_URL:http://localhost:9090}
